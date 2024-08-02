@@ -14,11 +14,11 @@ const PIECES = {
 type PiecesIdx = keyof typeof PIECES;
 
 enum Moves {
-  DOWN,
-  UP,
-  LEFT,
-  RIGHT,
-  ROTATE,
+  DOWN = "d",
+  UP = "u",
+  LEFT = "l",
+  RIGHT = "r",
+  ROTATE = "t",
 }
 
 /** Random number from min to max (min and max included) */
@@ -34,6 +34,8 @@ function randomIntFromInterval(min: number, max: number): number {
 })
 export class AppComponent implements OnInit {
 
+  private readonly EMPTY = 0;
+
   private readonly BOARD_SIZE = { x: 16, y: 28 }
 
   protected board!: number[][]
@@ -41,6 +43,8 @@ export class AppComponent implements OnInit {
   private delay!: number;
 
   protected nextPiece!: number[][];
+  private currentPiece!: number[][];
+  private position: { x: number, y: number } = {x:0,y:0};
 
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {
@@ -72,7 +76,10 @@ export class AppComponent implements OnInit {
   initBoard(): void {
     this.board =
       new Array<Array<number>>(this.BOARD_SIZE.y)
-        .fill(new Array<number>(this.BOARD_SIZE.x).fill(0));
+        .fill([])
+        .map(e => 
+          new Array<number>(this.BOARD_SIZE.x)
+            .fill(this.EMPTY));
   }
 
   randomPiece(): number[][] {
@@ -83,13 +90,72 @@ export class AppComponent implements OnInit {
   }
 
   place(): void {
-    const newPiece = this.nextPiece;
+    this.currentPiece = this.nextPiece;
     this.nextPiece = this.randomPiece();
-    console.log({newPiece, nextPiece: this.nextPiece});
+    console.log({currentPiece: this.currentPiece, nextPiece: this.nextPiece}, {board: this.board});
+
+    this.position.y = 0;
+    this.position.x = (this.board[this.position.y].length / 2) 
+      - Math.round(this.currentPiece[this.position.y].length / 2);
+
+    this.currentPiece.forEach((r, ri) => r.forEach((c,ci) => {
+      if (c >= 0)
+        this.board[ri][this.position.x + ci] = c;
+    }));
   }
 
   move(action: Moves): void {
-    console.log("move: ", action);
+    console.log("move: ", action, {x: this.position.x , y: this.position.y});
+    this.clearPieceOnBoard();
+
+    switch (action) {
+      case Moves.DOWN :
+        if (this.position.y < (this.BOARD_SIZE.y - this.currentPiece[0].length -1))
+          this.position.y++;
+        break;
+      case Moves.UP :
+        // if (this.position.y < this.BOARD_SIZE.)
+        //   this.position.y = this.position.y++;
+        break;
+      case Moves.LEFT :
+        if (this.position.x > 0)
+          this.position.x--;
+        break;
+      case Moves.RIGHT :
+        if (this.position.x < (this.BOARD_SIZE.x - this.currentPiece.length - 1))
+          this.position.x++;
+        break;
+      case Moves.ROTATE:
+        this.currentPiece = this.rotate(this.currentPiece) ;
+    }
+
+
+    this.currentPiece.forEach((r, ri) => 
+      r.forEach((c,ci) => {
+        if (c >= 0)
+          this.board[this.position.y + ri][this.position.x + ci] = c
+    })); 
+  }
+
+  private clearPieceOnBoard(): void {
+    this.currentPiece.forEach((r, ri) => 
+      r.forEach((c,ci) => {
+        if (c > 0)
+          this.board[this.position.y + ri][this.position.x + ci ] = 0;
+    })); 
+  }
+
+  private rotate(piece: number[][]): number[][] {
+    const numRows = piece.length;
+    const numCols = piece[0].length;
+  
+    const rotatedMatrix: number[][] = Array.from({ length: numCols }, () => Array(numRows).fill(false));
+  
+    for (let row = 0; row < numRows; row++) 
+      for (let col = 0; col < numCols; col++) 
+        rotatedMatrix[col][numRows - 1 - row] = piece[row][col];
+  
+    return rotatedMatrix;
   }
 
   verifyWall(): void { }
