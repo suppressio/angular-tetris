@@ -1,5 +1,5 @@
 import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
-import { delay, of, repeat, Subscriber, Subscription } from 'rxjs';
+import { delay, of, repeat, Subscription } from 'rxjs';
 
 const PIECES = {
   I: [[true, true, true, true]],
@@ -26,7 +26,6 @@ function randomIntFromInterval(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -35,20 +34,27 @@ function randomIntFromInterval(min: number, max: number): number {
 export class AppComponent implements OnInit, OnDestroy {
   private readonly EMPTY = 0;
 
-  private readonly BOARD_SIZE = { x: 16, y: 28 }
-
+  private readonly BOARD_SIZE = { x: 12, y: 18 }
   protected board!: number[][]
 
-  private readonly delay: number = 500;
+  private readonly delay: number = 800;
 
   protected nextPiece!: number[][];
   private currentPiece!: number[][];
   private position: { x: number, y: number } = { x: 0, y: 0 };
 
-  private subs = new Subscription();
+  private timeMoveSub!: Subscription;
+
+  countNoCollision: number = 0;
+
+  protected inGame: boolean = false;
+  protected gameOver: boolean = false;
+  protected pause: boolean = false;
 
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {
+    if (!this.inGame) return;
+
     switch (event.key) {
       case "ArrowDown":
         this.move(Moves.DOWN)
@@ -71,51 +77,62 @@ export class AppComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.initBoard();
     this.nextPiece = this.randomPiece();
-    this.place();
-    this.timeMove();
   }
 
-  initBoard(): void {
+  private initBoard(): void {
     this.board =
       new Array<Array<number>>(this.BOARD_SIZE.y)
         .fill([])
-        .map(e =>
+        .map(() =>
           new Array<number>(this.BOARD_SIZE.x)
             .fill(this.EMPTY));
   }
 
-  randomPiece(): number[][] {
+  startGame(): void {
+    this.stopTimeMove();
+    this.inGame = true;
+    this.gameOver = false;
+    this.initBoard();
+    this.place();
+    this.timeMove();
+  }
+
+  private setGameOver(): void {
+    this.inGame = false;
+    this.gameOver = true;
+    this.stopTimeMove();
+  }
+
+  private randomPiece(): number[][] {
     const randomColor = randomIntFromInterval(1, 5);
     const keys = Object.keys(PIECES) as PiecesIdx[];
     const randomIndex = randomIntFromInterval(0, keys.length - 1);
     return PIECES[keys[randomIndex]].map(y => y.map(x => x ? randomColor : 0));
   }
 
-  place(): void {
+  private place(): void {
     this.currentPiece = this.nextPiece;
     this.nextPiece = this.randomPiece();
-    console.log({ currentPiece: this.currentPiece, nextPiece: this.nextPiece }, { board: this.board });
 
     this.position.y = 0;
     this.position.x = (this.board[this.position.y].length / 2)
       - Math.round(this.currentPiece[this.position.y].length / 2);
 
     this.currentPiece.forEach((r, ri) => r.forEach((c, ci) => {
-      if (c >= 0)
+      if (c > 0)
         this.board[ri][this.position.x + ci] = c;
     }));
+    this.countNoCollision = 0;
   }
 
-  move(action: Moves): void {
-    console.log("move: ", action, { x: this.position.x, y: this.position.y });
-
+  private move(action: Moves): void {
     this.clearPrevMove();
 
     const newPos = { ...this.position };
 
     switch (action) {
       case Moves.DOWN:
-        if (this.position.y < (this.BOARD_SIZE.y - this.currentPiece[0].length - 1))
+        if (this.position.y < (this.BOARD_SIZE.y - this.currentPiece.length))
           newPos.y++;
         else
           this.confirmMove();
@@ -129,11 +146,14 @@ export class AppComponent implements OnInit, OnDestroy {
           newPos.x--;
         break;
       case Moves.RIGHT:
-        if (this.position.x < (this.BOARD_SIZE.x - this.currentPiece.length - 1))
+        if (this.position.x < (this.BOARD_SIZE.x - this.currentPiece[0].length))
           newPos.x++;
         break;
       case Moves.ROTATE:
         this.currentPiece = this.rotate(this.currentPiece);
+        if (this.position.x > (this.BOARD_SIZE.x - this.currentPiece[0].length))
+          newPos.x = this.BOARD_SIZE.x - this.currentPiece[0].length;
+        break;
     }
 
     const canMove = this.testMove(newPos);
@@ -144,8 +164,14 @@ export class AppComponent implements OnInit, OnDestroy {
       this.position = { ...newPos };
     } else {
       this.confirmMove();
-      this.place();
+      if (this.countNoCollision <= 1)
+        this.setGameOver();
+      else {
+        this.verifyWall();
+        this.place();
+      }
     }
+    this.countNoCollision++;
   }
 
   private testMove(newPos: {
@@ -192,29 +218,43 @@ export class AppComponent implements OnInit, OnDestroy {
     const numRows = piece.length;
     const numCols = piece[0].length;
 
-    const rotatedMatrix: number[][] = Array.from({ length: numCols }, () => Array(numRows).fill(false));
+    const rotatedPiece: number[][] = 
+      Array.from({ length: numCols }, () => 
+        Array(numRows).fill(false));
 
     for (let row = 0; row < numRows; row++)
       for (let col = 0; col < numCols; col++)
-        rotatedMatrix[col][numRows - 1 - row] = piece[row][col];
+        rotatedPiece[col][numRows - 1 - row] = 
+          piece[row][col];
 
-    return rotatedMatrix;
+    return rotatedPiece;
   }
 
-  verifyWall(): void { }
+  private verifyWall(): void {
+    this.board.forEach((r, ri) => {
+      if (!r.includes(0)) {
+        this.board.splice(ri, 1);
+        this.board.unshift(new Array<number>(this.BOARD_SIZE.x)
+          .fill(this.EMPTY));
+      }
+    })
+  }
 
-  timeMove(): void {
-    this.subs.add(
+  private timeMove(): void {
+    this.timeMoveSub = 
       of(Moves.DOWN).pipe(
         delay(this.delay),
         repeat()
-      )
-        .subscribe(m =>
-          this.move(m)
-        ));
+      ).subscribe(m =>
+          this.move(m));
+  }
+
+  private stopTimeMove(): void {
+    if (this.timeMoveSub)
+      this.timeMoveSub.unsubscribe();
   }
 
   ngOnDestroy(): void {
-    this.subs.unsubscribe();
+    this.stopTimeMove();
   }
 }

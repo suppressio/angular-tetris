@@ -18,3 +18,12 @@
     </tr>
   </table>
 </div>
+
+
+<div class="commands">
+  {{countNoCollision}}
+  <div (click)="startGame()">Start</div>
+</div>
+<div class="gameOver" *ngIf="gameOver">
+  Game Over
+</div>

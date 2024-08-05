@@ -30,3 +30,22 @@
         &.color5{ background-color: purple; }
     }
 }
+
+.gameOver{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    color: white;
+    font-size: 48px;
+}
+
+.commands{
+    position: absolute;
+    top: 100px;
+    left: 10px;
+    color: white;
+
+    cursor: pointer;
+}
