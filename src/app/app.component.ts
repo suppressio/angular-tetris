@@ -3,11 +3,6 @@ import { delay, map, Observable, of, repeat, Subscription } from 'rxjs';
 import { Coords, GameStates, Moves, PIECES, PiecesIdx } from './models/game.model';
 import { GameStateService } from './services/game-state.service';
 
-/** Random number from min to max (min and max included) */
-function randomIntFromInterval(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1) + min);
-}
-
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -16,14 +11,14 @@ function randomIntFromInterval(min: number, max: number): number {
 export class AppComponent implements OnInit, OnDestroy {
   private readonly EMPTY = 0;
 
-  private readonly BOARD_SIZE = { x: 12, y: 18 }
-  protected board!: number[][]
+  private readonly BOARD_SIZE = { x: 12, y: 18 };
+  protected board!: number[][];
 
   private readonly DEFAULT_DELAY: number = 800;
 
   protected nextPiece!: number[][];
   private currentPiece!: number[][];
-  private position: Coords = 
+  private position: Coords =
     { x: 0, y: 0 };
 
   private timeMoveSub!: Subscription;
@@ -93,9 +88,13 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   private _getRandomPiece(): number[][] {
-    const randomColor = randomIntFromInterval(1, 5);
+    /** Random number from min to max (min and max included) */
+    const __randomIntFromInterval = (min: number, max: number): number =>
+      Math.floor(Math.random() * (max - min + 1) + min);
+
     const keys = Object.keys(PIECES) as PiecesIdx[];
-    const randomIndex = randomIntFromInterval(0, keys.length - 1);
+    const randomIndex = __randomIntFromInterval(0, keys.length - 1);
+    const randomColor = __randomIntFromInterval(1, 5);
     return PIECES[keys[randomIndex]].map(y => y.map(x => x ? randomColor : 0));
   }
 
@@ -107,7 +106,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.position.x = (this.board[this.position.y].length / 2)
       - Math.round(this.currentPiece[this.position.y].length / 2);
 
-    this.currentPiece.forEach((r, ri) => 
+    this.currentPiece.forEach((r, ri) =>
       r.forEach((c, ci) => {
         if (c > 0)
           this.board[ri][this.position.x + ci] = c;
@@ -123,36 +122,26 @@ export class AppComponent implements OnInit, OnDestroy {
 
     switch (action) {
       case Moves.DOWN:
-        if (this.position.y < (this.BOARD_SIZE.y - this.currentPiece.length))
-          newPos.y++;
-        else
-          this._confirmMove();
+        newPos.y++;
         break;
       case Moves.UP:
-         while (newPos.y < (this.BOARD_SIZE.y - this.currentPiece.length)
-          && this._testMove(newPos))
-            newPos.y++;
-          newPos.y--;
+        this._scrollDown(newPos);
         break;
       case Moves.LEFT:
-        if (this.position.x > 0)
-          newPos.x--;
+        newPos.x--;
         break;
       case Moves.RIGHT:
-        if (this.position.x < (this.BOARD_SIZE.x - this.currentPiece[0].length))
-          newPos.x++;
+        newPos.x++;
         break;
       case Moves.ROTATE:
-        this.currentPiece = this._rotate(this.currentPiece);
-        if (this.position.x > (this.BOARD_SIZE.x - this.currentPiece[0].length))
-          newPos.x = this.BOARD_SIZE.x - this.currentPiece[0].length;
+        this._safeRotate();
         break;
     }
 
-    const canMove = this._testMove(newPos);
+    const canMove = this._testMove(this.currentPiece, newPos);
 
     if (canMove) {
-      canMove.moves.forEach(m =>
+      canMove.move.forEach(m =>
         this.board[m.y][m.x] = canMove.color);
       this.position = { ...newPos };
     } else {
@@ -169,16 +158,19 @@ export class AppComponent implements OnInit, OnDestroy {
     this.countNoCollision++;
   }
 
-  private _testMove(newPos: Coords): { moves: Coords[], color: number } | false {
-    const moves: Coords[] = [];
+  private _testMove(piece: number[][], newPos: Coords): { move: Coords[], color: number } | false {
+    const move: Coords[] = [];
     let permitted = true;
     let color = 0;
 
-    this.currentPiece.forEach((r, ri) =>
+    piece.forEach((r, ri) =>
       r.forEach((c, ci) => {
         if (c > 0 && permitted)
-          if (this.board[newPos.y + ri][newPos.x + ci] === 0) {
-            moves.push({
+          if (
+            this.board[newPos.y + ri]
+            && this.board[newPos.y + ri][newPos.x + ci] === 0
+          ) {
+            move.push({
               x: newPos.x + ci,
               y: newPos.y + ri,
             });
@@ -187,7 +179,7 @@ export class AppComponent implements OnInit, OnDestroy {
             permitted = false;
       }));
 
-    return permitted ? { moves, color } : false;
+    return permitted ? { move, color } : false;
   }
 
   private _confirmMove(): void {
@@ -206,20 +198,36 @@ export class AppComponent implements OnInit, OnDestroy {
       }));
   }
 
-  private _rotate(piece: number[][]): number[][] {
-    const numRows = piece.length;
-    const numCols = piece[0].length;
+  private _safeRotate(): void {
+    function __rotate(piece: number[][]): number[][] {
+      const numRows = piece.length;
+      const numCols = piece[0].length;
 
-    const rotatedPiece: number[][] =
-      Array.from({ length: numCols }, () =>
-        Array(numRows).fill(false));
+      const rotatedPiece: number[][] =
+        Array.from({ length: numCols }, () =>
+          Array(numRows).fill(false));
 
-    for (let row = 0; row < numRows; row++)
-      for (let col = 0; col < numCols; col++)
-        rotatedPiece[col][numRows - 1 - row] =
-          piece[row][col];
+      for (let row = 0; row < numRows; row++)
+        for (let col = 0; col < numCols; col++)
+          rotatedPiece[col][numRows - 1 - row] =
+            piece[row][col];
 
-    return rotatedPiece;
+      return rotatedPiece;
+    }
+
+    let rotate: number[][] = __rotate(this.currentPiece);
+    while (this._testMove(rotate, this.position) === false)
+      rotate = __rotate(rotate);
+
+    this.currentPiece = rotate;
+  }
+
+  private _scrollDown(position: Coords): void {
+    while (this._testMove(this.currentPiece, position)) {
+      position.y++;
+      this.countNoCollision++;
+    }
+    position.y--;
   }
 
   private _verifyWall(): void {

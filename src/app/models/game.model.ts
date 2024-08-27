@@ -1,11 +1,39 @@
 export const PIECES = {
-    I: [[true, true, true, true]],
-    L: [[true, false, false], [true, true, true]],
-    L2: [[false, false, true], [true, true, true]],
-    Q: [[true, true], [true, true]],
-    S: [[true, true, false], [false, true, true]],
-    S2: [[false, true, true], [true, true, false]],
-    A: [[false, true, false], [true, true, true]],
+    I: [
+        [false, false, false, false],
+        [true, true, true, true],
+        [false, false, false, false],
+        [false, false, false, false],
+    ],
+    L: [
+        [true, false, false], 
+        [true, true, true],
+        [false, false, false],
+    ],
+    J: [
+        [false, false, true],
+        [true, true, true],
+        [false, false, false],
+    ],
+    O: [
+        [true, true],
+        [true, true],
+    ],
+    S: [
+        [true, true, false],
+        [false, true, true],
+        [false, false, false],
+    ],
+    Z: [
+        [false, true, true],
+        [true, true, false],
+        [false, false, false],
+    ],
+    T: [
+        [false, false, false],
+        [true, true, true],
+        [false, true, false], 
+    ],
 }
 
 export type PiecesIdx = keyof typeof PIECES;
