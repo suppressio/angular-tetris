@@ -21,9 +21,13 @@
 
 
 <div class="commands">
-  {{countNoCollision}}
-  <div (click)="startGame()">Start</div>
+  <!-- CountMove: {{countNoCollision}}<br/>
+  Pause: {{pause}}<br/> -->
+  <div (click)="startGame()" class="div-button">Start</div>
 </div>
-<div class="gameOver" *ngIf="gameOver">
-  Game Over
+
+<div 
+  class="screen-cover-messages" 
+  *ngIf="onScreenMessage$ | async">
+  {{ onScreenMessage$ | async }}
 </div>
