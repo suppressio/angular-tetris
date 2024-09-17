@@ -11,7 +11,7 @@
 
 <div class="preview">
   <table class="tetris">
-    <tr *ngFor="let row of nextPiece">
+    <tr *ngFor="let row of nextPiece.piece">
       <td *ngFor="let cell of row"
         [ngClass]="'color'+cell">
       </td>
