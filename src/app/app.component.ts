@@ -1,6 +1,6 @@
 import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { delay, map, Observable, of, repeat, Subscription } from 'rxjs';
-import { Coords, GameStates, getWallKickKey, Moves, TERAMINOS, TeraminoKeys, Rotations, Teramino, WALL_KICK_I, WALL_KICK_JLSTZ } from './models/game.model';
+import { Coords, GameStates, getWallKickKey, Moves, TERAMINOS, TeraminoKeys, Rotations, Teramino, WALL_KICK_I, WALL_KICK_JLSTZ, RotationsKeys, TeraminoColors } from './models/game.model';
 import { GameStateService } from './services/game-state.service';
 
 @Component({
@@ -92,13 +92,13 @@ export class AppComponent implements OnInit, OnDestroy {
     const __randomIntFromInterval = (min: number, max: number): number =>
       Math.floor(Math.random() * (max - min + 1) + min);
 
-    const keys = Object.keys(TERAMINOS) as TeraminoKeys[];
-    const randomIndex = __randomIntFromInterval(0, keys.length - 1);
-    const randomColor = __randomIntFromInterval(1, 5);
+    const keys: TeraminoKeys[] = Object.keys(TERAMINOS) as TeraminoKeys[];
+    const randomIndex: number = __randomIntFromInterval(0, keys.length - 1);
+    const color: number = randomIndex +1; // To use random color: __randomIntFromInterval(1, 7);
     return {
-      piece: TERAMINOS[keys[randomIndex]].map(y => y.map(x => x ? randomColor : 0)),
+      piece: TERAMINOS[keys[randomIndex]].map(y => y.map(x => x ? color : this.EMPTY)),
       type: keys[randomIndex],
-      rotation: Object.keys(Rotations)[Rotations.R_0] as keyof typeof Rotations,
+      rotation: Object.keys(Rotations)[Rotations.R_0] as RotationsKeys,
     };
   }
 
@@ -165,11 +165,11 @@ export class AppComponent implements OnInit, OnDestroy {
   private _testMove(piece: number[][], newPos: Coords): { move: Coords[], color: number } | false {
     const move: Coords[] = [];
     let permitted = true;
-    let color = 0;
+    let color = this.EMPTY;
 
     piece.forEach((r, ri) =>
       r.forEach((c, ci) => {
-        if (c > 0 && permitted)
+        if (c > this.EMPTY && permitted)
           if (
             this.board[newPos.y + ri]
             && this.board[newPos.y + ri][newPos.x + ci] === 0
@@ -189,7 +189,7 @@ export class AppComponent implements OnInit, OnDestroy {
   private _confirmMove(): void {
     this.currentPiece.piece.forEach((r, ri) =>
       r.forEach((c, ci) => {
-        if (c > 0)
+        if (c > this.EMPTY)
           this.board[this.position.y + ri][this.position.x + ci] = c;
       }));
   }
@@ -197,7 +197,7 @@ export class AppComponent implements OnInit, OnDestroy {
   private _clearPrevMove(): void {
     this.currentPiece.piece.forEach((r, ri) =>
       r.forEach((c, ci) => {
-        if (c > 0)
+        if (c > this.EMPTY)
           this.board[this.position.y + ri][this.position.x + ci] = this.EMPTY;
       }));
   }
@@ -221,7 +221,7 @@ export class AppComponent implements OnInit, OnDestroy {
       return {
         ...t,
         piece: rotatedPiece,
-        rotation: Object.keys(Rotations)[(idx + (toLeft ? -1 : 1)) % 4] as keyof typeof Rotations,
+        rotation: Object.keys(Rotations)[(idx + (toLeft ? -1 : 1)) % 4] as RotationsKeys,
       };
     }
 

@@ -35,13 +35,16 @@ export const TERAMINOS = {
         [false, true, false],
     ],
 }
-
 export type TeraminoKeys = keyof typeof TERAMINOS;
+
+export enum TeraminoColors {
+    I=1, L, J, O, S, Z, T,
+}
 
 export interface Teramino { 
   piece: number[][], 
   rotation: keyof typeof Rotations,
-  type: keyof typeof TERAMINOS,
+  type: TeraminoKeys,
 }
  
 export enum Moves {
@@ -67,6 +70,7 @@ export enum Rotations {
     R_2 = "2",
     R_L = "L",
 }
+export type RotationsKeys = keyof typeof Rotations;
 
 export interface WallKick {
     "0R": number[][];
@@ -102,7 +106,7 @@ export const WALL_KICK_I: WallKick = {
 };
 
 export const getWallKickKey = (
-    from: keyof typeof Rotations, 
-    to: keyof typeof Rotations
+    from: RotationsKeys, 
+    to: RotationsKeys
 ): keyof WallKick => 
     `${Rotations[from]}${Rotations[to]}` as keyof WallKick ;
