@@ -1,27 +1,52 @@
-# Tetris
+# Angular Tetris Game
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 14.0.4.
+A simple implementation of the classic Tetris game built with Angular. 
+This project showcases basic game mechanics including piece movement, rotation and collision detection.
 
-## Development server
+![image](https://github.com/user-attachments/assets/dd5c9426-1d16-423d-8252-ca686873601b)
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+## Features
 
-## Code scaffolding
+- **Classic Tetris Gameplay**: Drop and rotate tetrominoes to fill rows.
+- **Pause and Resume**: Easily pause the game and resume at any time.
+- **Game States**: Handle game diffent conditions.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## Acknowledgments
 
-## Build
+Inspired by the classic Tetris game.
+Built using the Angular framework and RxJS.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+## Installation
 
-## Running unit tests
+To run the project locally, follow these steps:
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Install the dependencies:
 
-## Running end-to-end tests
+`npm install`
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+## Start the development server
 
-## Further help
+`ng serve`
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+Open your browser and visit http://localhost:4200 to play the game...
+
+### Controls
+
+- **Arrow Down**: Move the tetromino down.
+- **Arrow Up**: Scroll the tetromino down instantly.
+- **Arrow Left**: Move the tetromino left.
+- **Arrow Right**: Move the tetromino right.
+- **Space**: Rotate the tetromino.
+- **P**: Pause/Resume the game.
+
+### Game States
+
+The game state is managed through an observable pattern using RxJS. The game can be in three states:
+
+- **INGAME**: The game is currently being played;
+- **PAUSE**: The game is paused;
+- **GAMEOVER**: The game has ended.
+
+# License
+
+This project is licensed under the MIT License.
