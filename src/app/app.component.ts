@@ -1,6 +1,6 @@
 import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { delay, map, Observable, of, repeat, Subscription } from 'rxjs';
-import { Coords, GameStates, Moves, PIECES, PiecesIdx } from './models/game.model';
+import { Coords, GameStates, Moves, TERAMINOS, TeraminoKeys, Rotations, Teramino, WALL_KICK_I, WALL_KICK_JLSTZ, RotationsKeys, WallKick } from './models/game.model';
 import { GameStateService } from './services/game-state.service';
 
 @Component({
@@ -16,8 +16,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private readonly DEFAULT_DELAY: number = 800;
 
-  protected nextPiece!: number[][];
-  private currentPiece!: number[][];
+  protected nextPiece!: Teramino;
+  private currentPiece!: Teramino;
   private position: Coords =
     { x: 0, y: 0 };
 
@@ -47,7 +47,7 @@ export class AppComponent implements OnInit, OnDestroy {
         this._move(Moves.DOWN)
         break;
       case "ArrowUp":
-        this._move(Moves.UP)
+        this._move(Moves.SCROLL)
         break;
       case "ArrowLeft":
         this._move(Moves.LEFT)
@@ -87,15 +87,19 @@ export class AppComponent implements OnInit, OnDestroy {
             .fill(this.EMPTY));
   }
 
-  private _getRandomPiece(): number[][] {
+  private _getRandomPiece(): Teramino {
     /** Random number from min to max (min and max included) */
     const __randomIntFromInterval = (min: number, max: number): number =>
       Math.floor(Math.random() * (max - min + 1) + min);
 
-    const keys = Object.keys(PIECES) as PiecesIdx[];
-    const randomIndex = __randomIntFromInterval(0, keys.length - 1);
-    const randomColor = __randomIntFromInterval(1, 5);
-    return PIECES[keys[randomIndex]].map(y => y.map(x => x ? randomColor : 0));
+    const keys: TeraminoKeys[] = Object.keys(TERAMINOS) as TeraminoKeys[];
+    const randomIndex: number = __randomIntFromInterval(0, keys.length - 1);
+    const color: number = randomIndex + 1; // To use random color: __randomIntFromInterval(1, 7);
+    return {
+      piece: TERAMINOS[keys[randomIndex]].map(y => y.map(x => x ? color : this.EMPTY)),
+      type: keys[randomIndex],
+      rotation: Object.keys(Rotations)[Rotations.R_0] as RotationsKeys,
+    };
   }
 
   private _place(): void {
@@ -104,9 +108,9 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.position.y = 0;
     this.position.x = (this.board[this.position.y].length / 2)
-      - Math.round(this.currentPiece[this.position.y].length / 2);
+      - Math.round(this.currentPiece.piece[this.position.y].length / 2);
 
-    this.currentPiece.forEach((r, ri) =>
+    this.currentPiece.piece.forEach((r, ri) =>
       r.forEach((c, ci) => {
         if (c > 0)
           this.board[ri][this.position.x + ci] = c;
@@ -124,9 +128,6 @@ export class AppComponent implements OnInit, OnDestroy {
       case Moves.DOWN:
         newPos.y++;
         break;
-      case Moves.UP:
-        this._scrollDown(newPos);
-        break;
       case Moves.LEFT:
         newPos.x--;
         break;
@@ -136,9 +137,12 @@ export class AppComponent implements OnInit, OnDestroy {
       case Moves.ROTATE:
         this._safeRotate();
         break;
+      case Moves.SCROLL:
+        this._scrollDown(newPos);
+        break;
     }
 
-    const canMove = this._testMove(this.currentPiece, newPos);
+    const canMove = this._testMove(this.currentPiece.piece, newPos);
 
     if (canMove) {
       canMove.move.forEach(m =>
@@ -161,14 +165,14 @@ export class AppComponent implements OnInit, OnDestroy {
   private _testMove(piece: number[][], newPos: Coords): { move: Coords[], color: number } | false {
     const move: Coords[] = [];
     let permitted = true;
-    let color = 0;
+    let color = this.EMPTY;
 
     piece.forEach((r, ri) =>
       r.forEach((c, ci) => {
-        if (c > 0 && permitted)
+        if (c > this.EMPTY && permitted) 
           if (
             this.board[newPos.y + ri]
-            && this.board[newPos.y + ri][newPos.x + ci] === 0
+            ?.[newPos.x + ci] === 0
           ) {
             move.push({
               x: newPos.x + ci,
@@ -178,30 +182,30 @@ export class AppComponent implements OnInit, OnDestroy {
           } else
             permitted = false;
       }));
-
+      
     return permitted ? { move, color } : false;
   }
 
   private _confirmMove(): void {
-    this.currentPiece.forEach((r, ri) =>
+    this.currentPiece.piece.forEach((r, ri) =>
       r.forEach((c, ci) => {
-        if (c > 0)
+        if (c > this.EMPTY)
           this.board[this.position.y + ri][this.position.x + ci] = c;
       }));
   }
 
   private _clearPrevMove(): void {
-    this.currentPiece.forEach((r, ri) =>
+    this.currentPiece.piece.forEach((r, ri) =>
       r.forEach((c, ci) => {
-        if (c > 0)
+        if (c > this.EMPTY)
           this.board[this.position.y + ri][this.position.x + ci] = this.EMPTY;
       }));
   }
 
-  private _safeRotate(): void {
-    function __rotate(piece: number[][]): number[][] {
-      const numRows = piece.length;
-      const numCols = piece[0].length;
+  private _safeRotate(toLeft?: true): void {
+    function __rotate(t: Teramino): Teramino {
+      const numRows = t.piece.length;
+      const numCols = t.piece[0].length;
 
       const rotatedPiece: number[][] =
         Array.from({ length: numCols }, () =>
@@ -210,20 +214,61 @@ export class AppComponent implements OnInit, OnDestroy {
       for (let row = 0; row < numRows; row++)
         for (let col = 0; col < numCols; col++)
           rotatedPiece[col][numRows - 1 - row] =
-            piece[row][col];
+            t.piece[row][col];
 
-      return rotatedPiece;
+      const idx = Object.keys(Rotations).indexOf(t.rotation);
+
+      return {
+        ...t,
+        piece: rotatedPiece,
+        rotation: Object.keys(Rotations)[(idx + (toLeft ? -1 : 1)) % 4] as RotationsKeys,
+      };
     }
 
-    let rotate: number[][] = __rotate(this.currentPiece);
-    while (this._testMove(rotate, this.position) === false)
-      rotate = __rotate(rotate);
+    const __getWallKickKey = (
+      from: RotationsKeys,
+      to: RotationsKeys
+    ): keyof WallKick =>
+      `${Rotations[from]}${Rotations[to]}` as keyof WallKick;
 
-    this.currentPiece = rotate;
+    function __wallKick(currentPiece: Teramino, rotated: Teramino): number[][] {
+      switch (rotated.type) {
+        case 'J':
+        case 'L':
+        case 'S':
+        case 'T':
+        case 'Z':
+          return WALL_KICK_JLSTZ[
+            __getWallKickKey(currentPiece.rotation, rotated.rotation)];
+        case 'I':
+          return WALL_KICK_I[
+            __getWallKickKey(currentPiece.rotation, rotated.rotation)];
+        default:
+          return [];
+      }
+    }
+
+    const rotated: Teramino = __rotate(this.currentPiece);
+    if (this._testMove(rotated.piece, this.position))
+      this.currentPiece = rotated;
+    else {
+      for (const coord of __wallKick(this.currentPiece, rotated)) {
+        const wallKickPos = {
+          x: this.position.x + coord[0],
+          y: this.position.y + coord[1],
+        };
+
+        if (this._testMove(rotated.piece, wallKickPos)) {
+          this.position = wallKickPos;
+          this.currentPiece = rotated;
+          break;
+        }
+      }
+    }
   }
 
   private _scrollDown(position: Coords): void {
-    while (this._testMove(this.currentPiece, position)) {
+    while (this._testMove(this.currentPiece.piece, position)) {
       position.y++;
       this.countNoCollision++;
     }

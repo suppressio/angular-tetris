@@ -23,11 +23,13 @@
         width: 20px;
         height: 20px;
 
-        &.color1{ background-color: red; }
-        &.color2{ background-color: greenyellow; }
-        &.color3{ background-color: blue; }
-        &.color4{ background-color: violet; }
-        &.color5{ background-color: purple; }
+        &.color1{ background-color: cyan; }
+        &.color2{ background-color: blue; }
+        &.color3{ background-color: orange; }
+        &.color4{ background-color: yellow; }
+        &.color5{ background-color: chartreuse; }
+        &.color6{ background-color: red; }
+        &.color7{ background-color: magenta; }
     }
 }
 
@@ -39,11 +41,16 @@
 
     color: white;
     font-size: 48px;
+    
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    text-transform: uppercase;
+    -webkit-text-stroke: 2px black;
 }
 
 .commands{
     position: absolute;
-    top: 100px;
+    top: 150px;
     left: 10px;
     color: white;
 
