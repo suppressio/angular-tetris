@@ -30,9 +30,9 @@ export const TERAMINOS = {
         [false, false, false],
     ],
     T: [
-        [false, false, false],
-        [true, true, true],
         [false, true, false],
+        [true, true, true],
+        [false, false, false],
     ],
 }
 export type TeraminoKeys = keyof typeof TERAMINOS;
@@ -104,9 +104,3 @@ export const WALL_KICK_I: WallKick = {
     "L0": [[ 1, 0], [-2, 0], [ 1, -2], [-2,  1]],
     "0L": [[-1, 0], [ 2, 0], [-1,  2], [ 2, -1]],
 };
-
-export const getWallKickKey = (
-    from: RotationsKeys, 
-    to: RotationsKeys
-): keyof WallKick => 
-    `${Rotations[from]}${Rotations[to]}` as keyof WallKick ;

@@ -1,6 +1,6 @@
 import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { delay, map, Observable, of, repeat, Subscription } from 'rxjs';
-import { Coords, GameStates, getWallKickKey, Moves, TERAMINOS, TeraminoKeys, Rotations, Teramino, WALL_KICK_I, WALL_KICK_JLSTZ, RotationsKeys, TeraminoColors } from './models/game.model';
+import { Coords, GameStates, Moves, TERAMINOS, TeraminoKeys, Rotations, Teramino, WALL_KICK_I, WALL_KICK_JLSTZ, RotationsKeys, WallKick } from './models/game.model';
 import { GameStateService } from './services/game-state.service';
 
 @Component({
@@ -94,7 +94,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
     const keys: TeraminoKeys[] = Object.keys(TERAMINOS) as TeraminoKeys[];
     const randomIndex: number = __randomIntFromInterval(0, keys.length - 1);
-    const color: number = randomIndex +1; // To use random color: __randomIntFromInterval(1, 7);
+    const color: number = randomIndex + 1; // To use random color: __randomIntFromInterval(1, 7);
     return {
       piece: TERAMINOS[keys[randomIndex]].map(y => y.map(x => x ? color : this.EMPTY)),
       type: keys[randomIndex],
@@ -169,10 +169,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
     piece.forEach((r, ri) =>
       r.forEach((c, ci) => {
-        if (c > this.EMPTY && permitted)
+        if (c > this.EMPTY && permitted) 
           if (
             this.board[newPos.y + ri]
-            && this.board[newPos.y + ri][newPos.x + ci] === 0
+            ?.[newPos.x + ci] === 0
           ) {
             move.push({
               x: newPos.x + ci,
@@ -182,7 +182,7 @@ export class AppComponent implements OnInit, OnDestroy {
           } else
             permitted = false;
       }));
-
+      
     return permitted ? { move, color } : false;
   }
 
@@ -225,6 +225,12 @@ export class AppComponent implements OnInit, OnDestroy {
       };
     }
 
+    const __getWallKickKey = (
+      from: RotationsKeys,
+      to: RotationsKeys
+    ): keyof WallKick =>
+      `${Rotations[from]}${Rotations[to]}` as keyof WallKick;
+
     function __wallKick(currentPiece: Teramino, rotated: Teramino): number[][] {
       switch (rotated.type) {
         case 'J':
@@ -233,17 +239,19 @@ export class AppComponent implements OnInit, OnDestroy {
         case 'T':
         case 'Z':
           return WALL_KICK_JLSTZ[
-            getWallKickKey(currentPiece.rotation, rotated.rotation)];
+            __getWallKickKey(currentPiece.rotation, rotated.rotation)];
         case 'I':
           return WALL_KICK_I[
-            getWallKickKey(currentPiece.rotation, rotated.rotation)];
+            __getWallKickKey(currentPiece.rotation, rotated.rotation)];
         default:
           return [];
       }
     }
 
     const rotated: Teramino = __rotate(this.currentPiece);
-    if (this._testMove(rotated.piece, this.position) === false) {      
+    if (this._testMove(rotated.piece, this.position))
+      this.currentPiece = rotated;
+    else {
       for (const coord of __wallKick(this.currentPiece, rotated)) {
         const wallKickPos = {
           x: this.position.x + coord[0],
@@ -252,12 +260,11 @@ export class AppComponent implements OnInit, OnDestroy {
 
         if (this._testMove(rotated.piece, wallKickPos)) {
           this.position = wallKickPos;
+          this.currentPiece = rotated;
           break;
         }
       }
     }
-
-    this.currentPiece = rotated;
   }
 
   private _scrollDown(position: Coords): void {
