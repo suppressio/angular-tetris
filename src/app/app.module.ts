@@ -3,15 +3,21 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
 import { GameStateService } from './services/game-state.service';
+import { SoundsService } from './services/sounds.service';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
   ],
   imports: [
-    BrowserModule
+    BrowserModule,
   ],
-  providers: [GameStateService],
-  bootstrap: [AppComponent]
+  providers: [
+    GameStateService,
+    SoundsService,
+  ],
+  bootstrap: [
+    AppComponent,
+  ]
 })
 export class AppModule { }

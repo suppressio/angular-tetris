@@ -3,7 +3,10 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  sounds: false,
+  volume_music: 0.6,
+  volume_effects: 0.8,
 };
 
 /*

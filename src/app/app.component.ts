@@ -2,6 +2,7 @@ import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { delay, map, Observable, of, repeat, Subscription } from 'rxjs';
 import { Coords, GameStates, Moves, TERAMINOS, TeraminoKeys, Rotations, Teramino, WALL_KICK_I, WALL_KICK_JLSTZ, RotationsKeys, WallKick } from './models/game.model';
 import { GameStateService } from './services/game-state.service';
+import { SoundsService } from './services/sounds.service';
 
 @Component({
   selector: 'app-root',
@@ -18,8 +19,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   protected nextPiece!: Teramino;
   private currentPiece!: Teramino;
-  private position: Coords =
-    { x: 0, y: 0 };
+  private position: Coords = { x: 0, y: 0 };
 
   private timeMoveSub!: Subscription;
 
@@ -37,7 +37,8 @@ export class AppComponent implements OnInit, OnDestroy {
     }));
 
   constructor(
-    private game: GameStateService
+    private game: GameStateService,
+    private sound: SoundsService,
   ) { }
 
   @HostListener('document:keydown', ['$event'])
@@ -72,11 +73,11 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   startGame(): void {
-    this._stopTimeMove();
+    this._stopTime();
     this.game.state = GameStates.INGAME;
     this._initBoard();
     this._place();
-    this._timeMove();
+    this._startTime();
   }
 
   private _initBoard(): void {
@@ -154,6 +155,7 @@ export class AppComponent implements OnInit, OnDestroy {
         if (this.countNoCollision <= 1)
           this._setGameOver();
         else {
+          this.sound.brick();
           this._verifyWall();
           this._place();
         }
@@ -169,7 +171,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
     piece.forEach((r, ri) =>
       r.forEach((c, ci) => {
-        if (c > this.EMPTY && permitted) 
+        if (c > this.EMPTY && permitted)
           if (
             this.board[newPos.y + ri]
             ?.[newPos.x + ci] === 0
@@ -182,7 +184,7 @@ export class AppComponent implements OnInit, OnDestroy {
           } else
             permitted = false;
       }));
-      
+
     return permitted ? { move, color } : false;
   }
 
@@ -249,9 +251,10 @@ export class AppComponent implements OnInit, OnDestroy {
     }
 
     const rotated: Teramino = __rotate(this.currentPiece);
-    if (this._testMove(rotated.piece, this.position))
+    if (this._testMove(rotated.piece, this.position)) {
       this.currentPiece = rotated;
-    else {
+      this.sound.rotate();
+    } else {
       for (const coord of __wallKick(this.currentPiece, rotated)) {
         const wallKickPos = {
           x: this.position.x + coord[0],
@@ -261,6 +264,7 @@ export class AppComponent implements OnInit, OnDestroy {
         if (this._testMove(rotated.piece, wallKickPos)) {
           this.position = wallKickPos;
           this.currentPiece = rotated;
+          this.sound.rotate();
           break;
         }
       }
@@ -273,6 +277,7 @@ export class AppComponent implements OnInit, OnDestroy {
       this.countNoCollision++;
     }
     position.y--;
+    this.sound.scroll();
   }
 
   private _verifyWall(): void {
@@ -285,7 +290,7 @@ export class AppComponent implements OnInit, OnDestroy {
     })
   }
 
-  private _timeMove(): void {
+  private _startTime(): void {
     this.timeMoveSub =
       of(Moves.DOWN).pipe(
         delay(this.DEFAULT_DELAY),
@@ -294,25 +299,26 @@ export class AppComponent implements OnInit, OnDestroy {
         this._move(m));
   }
 
-  private _stopTimeMove(): void {
-    if (this.timeMoveSub)
-      this.timeMoveSub.unsubscribe();
+  private _stopTime(): void {
+    this.timeMoveSub?.unsubscribe();
   }
 
   private _setGameOver(): void {
     this.game.state = GameStates.GAMEOVER;
-    this._stopTimeMove();
+    this._stopTime();
   }
 
   private _togglePause(): void {
     switch (this.game.state) {
       case GameStates.INGAME:
         this.game.state = GameStates.PAUSE;
-        this._stopTimeMove();
+        this._stopTime();
+        this.sound.pause(true);
         break;
       case GameStates.PAUSE:
         this.game.state = GameStates.INGAME;
-        this._timeMove();
+        this._startTime();
+        this.sound.pause(false);
     }
   }
 
