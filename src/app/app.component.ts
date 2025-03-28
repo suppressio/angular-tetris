@@ -5,9 +5,10 @@ import { GameStateService } from './services/game-state.service';
 import { SoundsService } from './services/sounds.service';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss'],
+    standalone: false
 })
 export class AppComponent implements OnInit, OnDestroy {
   private readonly EMPTY = 0;
