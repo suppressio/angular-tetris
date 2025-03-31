@@ -1,0 +1,91 @@
+.board {
+    margin: auto;
+    border-left: 3px solid darkblue;
+    border-right: 3px solid darkorchid;
+    padding: 10px;
+
+    height: calc(100vh - 60px);
+    width: fit-content;
+}
+
+.preview {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    border: 1px solid pink;
+}
+
+.tetris {
+    background-color: rgb(28, 28, 28);
+
+    td {
+        background-color: black;
+        margin: 0.5px;
+        width: 20px;
+        height: 20px;
+
+        &.color1 {
+            background-color: cyan;
+        }
+
+        &.color2 {
+            background-color: blue;
+        }
+
+        &.color3 {
+            background-color: orange;
+        }
+
+        &.color4 {
+            background-color: yellow;
+        }
+
+        &.color5 {
+            background-color: chartreuse;
+        }
+
+        &.color6 {
+            background-color: red;
+        }
+
+        &.color7 {
+            background-color: magenta;
+        }
+    }
+}
+
+.screen-cover-messages {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    color: white;
+    font-size: 48px;
+
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    text-transform: uppercase;
+    -webkit-text-stroke: 2px black;
+}
+
+.commands {
+    position: absolute;
+    top: 150px;
+    left: 10px;
+    color: white;
+}
+
+.start-button {
+    background-color: transparent;
+    border: 1px solid white;
+    color: white;
+    border-radius: 2px;
+    padding: 6px 8px;
+    text-transform: uppercase;
+    cursor: pointer;
+
+    &:focus{
+        background-color: rgba(0, 0, 255, 0.5);
+    }
+}

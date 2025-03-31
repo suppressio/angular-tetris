@@ -1,0 +1,11 @@
+<div class="dialog">
+    <h1 class="title"></h1>
+    
+    <ng-content></ng-content>
+
+    <div class="actions"
+        *ngFor="let button of buttons">
+        <button 
+            (click)="button.fn()">{{button.label}}</button>
+    </div>
+</div>
