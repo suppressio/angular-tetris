@@ -1,0 +1,33 @@
+<div class="board">
+    <table class="tetris">
+      <tr *ngFor="let row of board">
+        <td *ngFor="let cell of row"
+          [ngClass]="'color'+cell">
+        </td>
+      </tr>
+    </table>
+  
+  </div>
+  
+  <div class="preview">
+    <table class="tetris">
+      <tr *ngFor="let row of nextPiece.piece">
+        <td *ngFor="let cell of row"
+          [ngClass]="'color'+cell">
+        </td>
+      </tr>
+    </table>
+  </div>
+  
+  <div class="commands">
+    <button class="start-button"
+      (click)="startGame()">
+      Start
+  </button>
+  </div>
+  
+  <div 
+    class="screen-cover-messages" 
+    *ngIf="onScreenMessage$ | async">
+    {{ onScreenMessage$ | async }}
+  </div>

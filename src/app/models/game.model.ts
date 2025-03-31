@@ -48,11 +48,12 @@ export interface Teramino {
 }
  
 export enum Moves {
-    DOWN = "d",
-    LEFT = "l",
-    RIGHT = "r",
-    ROTATE = "t",
-    SCROLL = "s",
+    DOWN = "__d",
+    LEFT = "__l",
+    RIGHT = "__r",
+    ROTATE_L = "__tl",
+    ROTATE_R = "__tr",
+    SCROLL = "__s",
 }
 
 export enum GameStates {
@@ -92,7 +93,7 @@ export const WALL_KICK_JLSTZ: WallKick = {
     "L2": [[-1, 0], [-1, -1], [0,  2], [-1,  2]],
     "L0": [[-1, 0], [-1, -1], [0,  2], [-1,  2]],
     "0L": [[ 1, 0], [ 1,  1], [0, -2], [ 1, -2]],
-}
+} as const;
 
 export const WALL_KICK_I: WallKick = {
     "0R": [[-2, 0], [ 1, 0], [-2, -1], [ 1,  2]],
@@ -103,4 +104,4 @@ export const WALL_KICK_I: WallKick = {
     "L2": [[-2, 0], [ 1, 0], [-2, -1], [ 1,  2]],
     "L0": [[ 1, 0], [-2, 0], [ 1, -2], [-2,  1]],
     "0L": [[-1, 0], [ 2, 0], [-1,  2], [ 2, -1]],
-};
+} as const;

@@ -1,26 +1,39 @@
 import { Injectable } from "@angular/core";
-import { GameStateService } from "./game-state.service";
 import { environment as env } from "src/environments/environment";
+import { TETRIS } from "../models/contants.model";
+import { TetrisUtils } from "../components/tetris/tetris-utils";
 
 @Injectable()
 export class SoundsService {
-    private _base_path: string = "assets/audio/";
-    private _effects_path: string = "effects/";
-    private _music_path: string = "music/";
-    private _pause_sound: string = "pause#.mp3";
-    private _brick_sound: string = "brick#.mp3";
-    private _rotate_sound: string = "whoosh#.mp3";
+    private readonly _base_path = "assets/audio/";
+    private readonly _effects_path = "effects/";
+    private readonly _music_path = "music/";
 
-    constructor(
-        private game: GameStateService,
-    ) { }
+    private _volume_effects: number = env.volume_effects;
+    private _volume_music: number = env.volume_music;
+
+    set volume_effects(v: number) {
+        this._volume_effects = this._safeVolume(v);
+    }
+
+    get volume_effects(): number {
+        return this._volume_effects;
+    }
+
+    set volume_music(v: number) {
+        this._volume_music = this._safeVolume(v);
+    }
+
+    get volume_music(): number {
+        return this._volume_music;
+    }
 
     pause = (b: boolean) =>
         this._getSound(
             this._getPathFileName(
-                this._pause_sound,
+                TETRIS.SOUNDS.PAUSE,
                 b ? 1 : 2),
-            this.game.volume_effects
+            this.volume_effects
         )?.play();
 
     rotate = () => this._whoosh();
@@ -29,23 +42,23 @@ export class SoundsService {
     brick = () =>
         this._getSound(
             this._getPathFileName(
-                this._brick_sound,
-                this._rnd(1, 6)),
-            this.game.volume_effects
+                TETRIS.SOUNDS.BRICK,
+                TetrisUtils.rnd(1, 6)),
+            this.volume_effects
         )?.play();
 
     music = () =>
         this._getSound(
-            `${this._base_path}${this._music_path}theme-piano.mp3`,
-            this.game.volume_music
+            `${this._base_path}${this._music_path}${TETRIS.SOUNDS.MUSIC}`,
+            this.volume_music
         )?.play();
 
     private _whoosh = () =>
         this._getSound(
             this._getPathFileName(
-                this._rotate_sound,
-                this._rnd(1, 7)),
-            this.game.volume_effects
+                TETRIS.SOUNDS.ROTATE,
+                TetrisUtils.rnd(1, 7)),
+            this.volume_effects
         )?.play();
 
     private _getPathFileName = (base: string, idx: number): string =>
@@ -61,6 +74,6 @@ export class SoundsService {
         return s;
     }
 
-    private _rnd = (min: number, max: number): number =>
-        Math.floor(Math.random() * (max - min + 1) + min);
+    private _safeVolume = (v: number): number =>
+        (v >= 0 && v <= 1) ? v : TETRIS.DEFAULT_VOLUME;
 }
