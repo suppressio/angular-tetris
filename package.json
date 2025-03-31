@@ -7,7 +7,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "clean-imports": "ng generate @angular/core:cleanup-unused-imports"
   },
   "private": true,
   "dependencies": {
@@ -28,9 +29,9 @@
     "@angular/cli": "~19.2.5",
     "@angular/compiler-cli": "^19.2.4",
     "angular-eslint": "19.3.0",
-    "eslint": "^9.20.0",
+    "eslint": "^9.23.0",
     "jasmine-core": "~4.1.0",
     "typescript": "~5.8.2",
-    "typescript-eslint": "8.28.0"
+    "typescript-eslint": "8.27.0"
   }
 }
