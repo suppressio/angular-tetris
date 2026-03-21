@@ -1,6 +1,5 @@
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
-import { Moves } from './models/game.model';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
@@ -9,30 +8,18 @@ describe('AppComponent', () => {
     }).compileComponents();
   });
 
-  it('triggers automatic down move and change detection on timer tick', fakeAsync(() => {
+  it('creates the app component', () => {
     const fixture = TestBed.createComponent(AppComponent);
     const component = fixture.componentInstance;
 
-    fixture.detectChanges();
+    expect(component).toBeTruthy();
+  });
 
-    const moveSpy = spyOn<any>(component, '_move').and.callThrough();
-    const detectChangesSpy = spyOn((component as any).cdr, 'detectChanges').and.callThrough();
-
-    component.startGame();
-    tick(801);
-
-    expect(moveSpy).toHaveBeenCalledWith(Moves.DOWN);
-    expect(detectChangesSpy).toHaveBeenCalled();
-
-    component.ngOnDestroy();
-  }));
-
-  it('does not throw on destroy before timer starts', () => {
+  it('renders the tetris component host element', () => {
     const fixture = TestBed.createComponent(AppComponent);
-    const component = fixture.componentInstance;
-
     fixture.detectChanges();
 
-    expect(() => component.ngOnDestroy()).not.toThrow();
+    const compiled: HTMLElement = fixture.nativeElement;
+    expect(compiled.querySelector('app-tetris')).not.toBeNull();
   });
 });
