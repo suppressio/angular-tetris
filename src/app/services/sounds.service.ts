@@ -9,8 +9,12 @@ export class SoundsService {
   private readonly _effectsPath = 'effects/';
   private readonly _musicPath = 'music/';
 
+  private _enabled: boolean = env.sounds;
   private _volumeEffects: number = env.volume_effects;
   private _volumeMusic: number = env.volume_music;
+
+  get enabled(): boolean { return this._enabled; }
+  set enabled(v: boolean) { this._enabled = v; }
 
   set volume_effects(v: number) {
     this._volumeEffects = this._safeVolume(v);
@@ -59,7 +63,7 @@ export class SoundsService {
     `${this._basePath}${this._effectsPath}${base.replace('#', idx.toString())}`;
 
   private _getSound(path: string, volume?: number): HTMLAudioElement | null {
-    if (!env.sounds) return null;
+    if (!this._enabled) return null;
     let sound: HTMLAudioElement | null = new Audio();
     sound.src = path;
     sound.load();

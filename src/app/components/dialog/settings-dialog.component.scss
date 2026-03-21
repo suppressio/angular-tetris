@@ -31,7 +31,47 @@
 }
 
 .content {
-	min-height: 48px;
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	padding: 4px 0;
+}
+
+.setting-row {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	cursor: pointer;
+
+	&.disabled {
+		opacity: 0.35;
+		pointer-events: none;
+	}
+}
+
+.setting-label {
+	min-width: 64px;
+	font-size: 14px;
+}
+
+.setting-value {
+	min-width: 36px;
+	text-align: right;
+	font-size: 13px;
+	font-variant-numeric: tabular-nums;
+}
+
+.setting-row input[type='range'] {
+	flex: 1;
+	accent-color: white;
+	cursor: pointer;
+}
+
+.setting-row input[type='checkbox'] {
+	width: 16px;
+	height: 16px;
+	accent-color: white;
+	cursor: pointer;
 }
 
 .actions {

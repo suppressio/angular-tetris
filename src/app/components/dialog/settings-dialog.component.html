@@ -4,13 +4,40 @@
     <h1 id="settings-dialog-title" class="title">{{ title }}</h1>
 
     <div class="content">
-        <ng-content></ng-content>
+        <label class="setting-row">
+            <span class="setting-label">Speed</span>
+            <input type="range" min="1" max="10" step="1"
+                [value]="speed"
+                (input)="speed = +$any($event.target).value" />
+            <span class="setting-value">{{ speed }}/10</span>
+        </label>
+
+        <label class="setting-row">
+            <span class="setting-label">Sounds</span>
+            <input type="checkbox" [(ngModel)]="soundEnabled" />
+        </label>
+
+        <label class="setting-row" [ngClass]="{ disabled: !soundEnabled }">
+            <span class="setting-label">Effects</span>
+            <input type="range" min="0" max="100" step="5"
+                [value]="volumeEffects"
+                (input)="volumeEffects = +$any($event.target).value"
+                [disabled]="!soundEnabled" />
+            <span class="setting-value">{{ volumeEffects }}%</span>
+        </label>
+
+        <label class="setting-row" [ngClass]="{ disabled: !soundEnabled }">
+            <span class="setting-label">Music</span>
+            <input type="range" min="0" max="100" step="5"
+                [value]="volumeMusic"
+                (input)="volumeMusic = +$any($event.target).value"
+                [disabled]="!soundEnabled" />
+            <span class="setting-value">{{ volumeMusic }}%</span>
+        </label>
     </div>
 
     <div class="actions">
-        <button
-            *ngFor="let button of buttons"
-            type="button"
-            (click)="button.fn()">{{button.label}}</button>
+        <button type="button" (click)="close()">Cancel</button>
+        <button type="button" (click)="save()">Save</button>
     </div>
 </div>

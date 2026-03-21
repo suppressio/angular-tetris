@@ -32,7 +32,12 @@ export class SettingsDialogService implements SettingsDialog {
         this.show_dialog = false;
     }
 
-    apply(): void {
+    // Speed: 1 (slowest, 1000ms) → 10 (fastest, 100ms). Formula: delay = (11 - speed) * 100
+    speed = 10;
 
+    get delay(): number {
+        return (11 - this.speed) * 100;
     }
+
+    apply(): void {}
 }

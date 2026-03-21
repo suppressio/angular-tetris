@@ -237,7 +237,7 @@ export class TetrisComponent implements OnInit, OnDestroy {
   }
 
   private _startTime(): void {
-    this._timeMoveSub = timer(TETRIS.DEFAULT_DELAY, TETRIS.DEFAULT_DELAY)
+    this._timeMoveSub = timer(this.settingsDialog.delay, this.settingsDialog.delay)
       .subscribe(() => {
         this._move(Moves.DOWN);
         this.cdr.detectChanges();
