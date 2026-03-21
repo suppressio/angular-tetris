@@ -1,19 +1,17 @@
-import { Injectable } from "@angular/core";
+import { inject, Injectable } from "@angular/core";
 import { GameStateService } from "./game-state.service";
 import { environment as env } from "src/environments/environment";
 
 @Injectable()
 export class SoundsService {
-    private _base_path: string = "assets/audio/";
-    private _effects_path: string = "effects/";
-    private _music_path: string = "music/";
-    private _pause_sound: string = "pause#.mp3";
-    private _brick_sound: string = "brick#.mp3";
-    private _rotate_sound: string = "whoosh#.mp3";
+    private _base_path = "assets/audio/";
+    private _effects_path = "effects/";
+    private _music_path = "music/";
+    private _pause_sound = "pause#.mp3";
+    private _brick_sound = "brick#.mp3";
+    private _rotate_sound = "whoosh#.mp3";
 
-    constructor(
-        private game: GameStateService,
-    ) { }
+    private game = inject(GameStateService);
 
     pause = (b: boolean) =>
         this._getSound(

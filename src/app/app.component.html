@@ -1,21 +1,25 @@
 <div class="board">
   <table class="tetris">
-    <tr *ngFor="let row of board">
-      <td *ngFor="let cell of row"
-        [ngClass]="'color'+cell">
-      </td>
-    </tr>
+    @for (row of board; track $index) {
+      <tr>
+        @for (cell of row; track $index) {
+          <td [ngClass]="'color'+cell"></td>
+        }
+      </tr>
+    }
   </table>
 
 </div>
 
 <div class="preview">
   <table class="tetris">
-    <tr *ngFor="let row of nextPiece.piece">
-      <td *ngFor="let cell of row"
-        [ngClass]="'color'+cell">
-      </td>
-    </tr>
+    @for (row of nextPiece.piece; track $index) {
+      <tr>
+        @for (cell of row; track $index) {
+          <td [ngClass]="'color'+cell"></td>
+        }
+      </tr>
+    }
   </table>
 </div>
 
@@ -23,11 +27,11 @@
 <div class="commands">
   <!-- CountMove: {{countNoCollision}}<br/>
   Pause: {{pause}}<br/> -->
-  <div (click)="startGame()" class="div-button">Start</div>
+  <div (click)="startGame()" (keydown.enter)="startGame()" (keydown.space)="startGame()" tabindex="0" role="button" class="div-button">Start</div>
 </div>
 
-<div 
-  class="screen-cover-messages" 
-  *ngIf="onScreenMessage$ | async">
-  {{ onScreenMessage$ | async }}
-</div>
+@if (onScreenMessage$ | async; as message) {
+  <div class="screen-cover-messages">
+    {{ message }}
+  </div>
+}
