@@ -1,4 +1,5 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, inject, OnDestroy, OnInit } from '@angular/core';
+import { AsyncPipe, NgClass } from '@angular/common';
 import { delay, map, Observable, of, repeat, Subscription } from 'rxjs';
 import { Coords, GameStates, Moves, TERAMINOS, TeraminoKeys, Rotations, Teramino, WALL_KICK_I, WALL_KICK_JLSTZ, RotationsKeys, WallKick } from './models/game.model';
 import { GameStateService } from './services/game-state.service';
@@ -8,7 +9,8 @@ import { SoundsService } from './services/sounds.service';
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
-    standalone: false
+    imports: [NgClass, AsyncPipe],
+    providers: [GameStateService, SoundsService],
 })
 export class AppComponent implements OnInit, OnDestroy {
   private readonly EMPTY = 0;
@@ -16,7 +18,7 @@ export class AppComponent implements OnInit, OnDestroy {
   private readonly BOARD_SIZE = { x: 12, y: 18 };
   protected board!: number[][];
 
-  private readonly DEFAULT_DELAY: number = 800;
+  private readonly DEFAULT_DELAY = 800;
 
   protected nextPiece!: Teramino;
   private currentPiece!: Teramino;
@@ -24,7 +26,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private timeMoveSub!: Subscription;
 
-  private countNoCollision: number = 0;
+  private countNoCollision = 0;
+
+  private game = inject(GameStateService);
+  private sound = inject(SoundsService);
 
   protected onScreenMessage$: Observable<string | null> =
     this.game.state$.pipe(map(s => {
@@ -36,11 +41,6 @@ export class AppComponent implements OnInit, OnDestroy {
         default: return null;
       }
     }));
-
-  constructor(
-    private game: GameStateService,
-    private sound: SoundsService,
-  ) { }
 
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {
@@ -83,7 +83,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private _initBoard(): void {
     this.board =
-      new Array<Array<number>>(this.BOARD_SIZE.y)
+      new Array<number[]>(this.BOARD_SIZE.y)
         .fill([]).map(() =>
           new Array<number>(this.BOARD_SIZE.x)
             .fill(this.EMPTY));
