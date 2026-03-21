@@ -1,4 +1,4 @@
-import { Component, HostListener, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, inject, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { AsyncPipe, NgClass } from '@angular/common';
 import { delay, map, Observable, of, repeat, Subscription } from 'rxjs';
 import { Coords, GameStates, Moves, TERAMINOS, TeraminoKeys, Rotations, Teramino, WALL_KICK_I, WALL_KICK_JLSTZ, RotationsKeys, WallKick } from './models/game.model';
@@ -30,6 +30,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private game = inject(GameStateService);
   private sound = inject(SoundsService);
+  private ngZone = inject(NgZone);
 
   protected onScreenMessage$: Observable<string | null> =
     this.game.state$.pipe(map(s => {
@@ -292,12 +293,14 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   private _startTime(): void {
-    this.timeMoveSub =
-      of(Moves.DOWN).pipe(
-        delay(this.DEFAULT_DELAY),
-        repeat()
-      ).subscribe(m =>
-        this._move(m));
+    this.ngZone.runOutsideAngular(() => {
+      this.timeMoveSub =
+        of(Moves.DOWN).pipe(
+          delay(this.DEFAULT_DELAY),
+          repeat()
+        ).subscribe(m =>
+          this.ngZone.run(() => this._move(m)));
+    });
   }
 
   private _stopTime(): void {
