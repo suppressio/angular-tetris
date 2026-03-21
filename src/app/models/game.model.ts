@@ -84,6 +84,8 @@ export interface WallKick {
     "0L": number[][];
 }
 
+// SRS wall kick reference:
+// https://tetris.wiki/Super_Rotation_System#Wall_Kicks
 export const WALL_KICK_JLSTZ: WallKick = {
     "0R": [[-1, 0], [-1,  1], [0, -2], [-1, -2]],
     "R0": [[ 1, 0], [ 1, -1], [0,  2], [ 1,  2]],
