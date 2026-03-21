@@ -76,6 +76,9 @@
     color: white;
 
     cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .div-button {
@@ -86,4 +89,9 @@
     &:focus {
         background-color: rgba(0, 0, 255, 0.5);
     }
+}
+
+.debug {
+    font-size: 12px;
+    opacity: 0.85;
 }

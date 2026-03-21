@@ -1,10 +1,12 @@
 import { AsyncPipe, NgClass } from '@angular/common';
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { delay, Observable, of, repeat, Subscription } from 'rxjs';
 import { TETRIS } from 'src/app/models/contants.model';
 import { Coords, GameStates, Moves, Teramino } from '../../models/game.model';
+import { SettingsDialogComponent } from '../dialog/settings-dialog.component';
 import { GameStateService } from '../../services/game-state.service';
 import { InputsService } from '../../services/inputs.service';
+import { SettingsDialogService } from '../../services/settings-dialog.service';
 import { SoundsService } from '../../services/sounds.service';
 import { TetrisUtils } from './tetris-utils';
 
@@ -13,8 +15,8 @@ import { TetrisUtils } from './tetris-utils';
   templateUrl: './tetris.component.html',
   styleUrls: ['./tetris.component.scss'],
   standalone: true,
-  imports: [NgClass, AsyncPipe],
-  providers: [GameStateService, SoundsService, InputsService],
+  imports: [NgClass, AsyncPipe, SettingsDialogComponent],
+  providers: [GameStateService, SoundsService, InputsService, SettingsDialogService],
 })
 export class TetrisComponent implements OnInit, OnDestroy {
   protected board!: number[][];
@@ -38,7 +40,25 @@ export class TetrisComponent implements OnInit, OnDestroy {
     private game: GameStateService,
     private sound: SoundsService,
     private input: InputsService,
+    private settingsDialog: SettingsDialogService,
+    private cdr: ChangeDetectorRef,
   ) {}
+
+  get showSettingsDialog(): boolean {
+    return this.settingsDialog.show_dialog;
+  }
+
+  get countNoCollision(): number {
+    return this._countNoCollision;
+  }
+
+  get paused(): boolean {
+    return this.game.state === GameStates.PAUSE;
+  }
+
+  openSettings(): void {
+    this.settingsDialog.open();
+  }
 
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(e: KeyboardEvent): void {
@@ -221,7 +241,10 @@ export class TetrisComponent implements OnInit, OnDestroy {
     this._timeMoveSub = of(Moves.DOWN)
       .pipe(delay(this.game.delay), repeat())
       .subscribe({
-        next: (m) => this._move(m),
+        next: (m) => {
+          this._move(m);
+          this.cdr.detectChanges();
+        },
         error: (e) => console.error(e),
       });
   }

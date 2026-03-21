@@ -7,11 +7,11 @@ export class SettingsDialogService implements SettingsDialog {
 
     buttons: DialogButton[] = [{
         label: "Close",
-        fn: this.close,
+        fn: () => this.close(),
     },
     {
         label: "Save",
-        fn: this.apply,
+        fn: () => this.apply(),
     }];
 
     private _show = false;
@@ -22,6 +22,10 @@ export class SettingsDialogService implements SettingsDialog {
 
     set show_dialog(s: boolean) {
         this._show = s;
+    }
+
+    open(): void {
+        this.show_dialog = true;
     }
 
     close(): void {
