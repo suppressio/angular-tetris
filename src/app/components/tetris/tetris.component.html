@@ -1,0 +1,39 @@
+<div class="board">
+  <table class="tetris">
+    @for (row of board; track $index) {
+      <tr>
+        @for (cell of row; track $index) {
+          <td [ngClass]="'color'+cell"></td>
+        }
+      </tr>
+    }
+  </table>
+</div>
+
+<div class="preview">
+  <table class="tetris">
+    @for (row of nextPiece.piece; track $index) {
+      <tr>
+        @for (cell of row; track $index) {
+          <td [ngClass]="'color'+cell"></td>
+        }
+      </tr>
+    }
+  </table>
+</div>
+
+<div class="commands">
+  <div (mousedown)="$event.preventDefault()" (click)="startGame()" (keydown.enter)="startGame()" tabindex="0" role="button" class="div-button">Start</div>
+  <div (mousedown)="$event.preventDefault()" (click)="openSettings()" (keydown.enter)="openSettings()" tabindex="0" role="button" class="div-button">Settings</div>
+  <div class="debug">CountMove: {{ countNoCollision }}<br/>Pause: {{ paused }}</div>
+</div>
+
+@if (onScreenMessage$ | async; as message) {
+  <div class="screen-cover-messages">
+    {{ message }}
+  </div>
+}
+
+@if (showSettingsDialog) {
+  <app-config-dialog></app-config-dialog>
+}

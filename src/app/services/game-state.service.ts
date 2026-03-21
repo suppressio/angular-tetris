@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { GameStates } from "../models/game.model";
-import { BehaviorSubject, Observable } from "rxjs";
-import { environment as env } from "src/environments/environment";
+import { BehaviorSubject, map, Observable } from "rxjs";
+import { TETRIS } from "../models/contants.model";
 
 @Injectable()
 export class GameStateService {
@@ -9,10 +9,7 @@ export class GameStateService {
   private _state: GameStates = GameStates.NOGAME;
   private _state$ = new BehaviorSubject<GameStates>(this._state);
 
-  private readonly DEFAULT_VOLUME = 0.8;
-
-  private _volume_effects: number = env.volume_effects;
-  private _volume_music: number = env.volume_music;
+  private _delay: number = TETRIS.DEFAULT_DELAY;
 
   set state(newState: GameStates) {
     this._state = newState;
@@ -23,26 +20,22 @@ export class GameStateService {
     return this._state;
   }
 
-  get state$(): Observable<GameStates> {
-    return this._state$.asObservable();
+  stateMessages$: Observable<string | null> =
+    this._state$.pipe(map(s => {
+      switch (s) {
+        case GameStates.GAMEOVER:
+          return "Game Over"
+        case GameStates.PAUSE:
+          return "Pause"
+        default: return null;
+      }
+    }));
+
+  set delay(d: number) {
+    this._delay = d;
   }
 
-  set volume_effects(v: number) {
-    this._volume_effects = this._safeVolume(v);
+  get delay(): number {
+    return this._delay;
   }
-
-  get volume_effects(): number {
-    return this._volume_effects;
-  }
-
-  set volume_music(v: number) {
-    this._volume_music = this._safeVolume(v);
-  }
-
-  get volume_music(): number {
-    return this._volume_music;
-  }
-
-  private _safeVolume = (v: number): number =>
-    (v >= 0 && v <= 1) ? v : this.DEFAULT_VOLUME;
 }

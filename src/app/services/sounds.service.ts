@@ -1,64 +1,79 @@
-import { inject, Injectable } from "@angular/core";
-import { GameStateService } from "./game-state.service";
-import { environment as env } from "src/environments/environment";
+import { Injectable } from '@angular/core';
+import { environment as env } from 'src/environments/environment';
+import { TETRIS } from '../models/contants.model';
+import { TetrisUtils } from '../components/tetris/tetris-utils';
 
 @Injectable()
 export class SoundsService {
-    private _base_path = "assets/audio/";
-    private _effects_path = "effects/";
-    private _music_path = "music/";
-    private _pause_sound = "pause#.mp3";
-    private _brick_sound = "brick#.mp3";
-    private _rotate_sound = "whoosh#.mp3";
+  private readonly _basePath = 'assets/audio/';
+  private readonly _effectsPath = 'effects/';
+  private readonly _musicPath = 'music/';
 
-    private game = inject(GameStateService);
+  private _enabled: boolean = env.sounds;
+  private _volumeEffects: number = env.volume_effects;
+  private _volumeMusic: number = env.volume_music;
 
-    pause = (b: boolean) =>
-        this._getSound(
-            this._getPathFileName(
-                this._pause_sound,
-                b ? 1 : 2),
-            this.game.volume_effects
-        )?.play();
+  get enabled(): boolean { return this._enabled; }
+  set enabled(v: boolean) { this._enabled = v; }
 
-    rotate = () => this._whoosh();
-    scroll = () => this._whoosh();
+  set volume_effects(v: number) {
+    this._volumeEffects = this._safeVolume(v);
+  }
 
-    brick = () =>
-        this._getSound(
-            this._getPathFileName(
-                this._brick_sound,
-                this._rnd(1, 6)),
-            this.game.volume_effects
-        )?.play();
+  get volume_effects(): number {
+    return this._volumeEffects;
+  }
 
-    music = () =>
-        this._getSound(
-            `${this._base_path}${this._music_path}theme-piano.mp3`,
-            this.game.volume_music
-        )?.play();
+  set volume_music(v: number) {
+    this._volumeMusic = this._safeVolume(v);
+  }
 
-    private _whoosh = () =>
-        this._getSound(
-            this._getPathFileName(
-                this._rotate_sound,
-                this._rnd(1, 7)),
-            this.game.volume_effects
-        )?.play();
+  get volume_music(): number {
+    return this._volumeMusic;
+  }
 
-    private _getPathFileName = (base: string, idx: number): string =>
-        `${this._base_path}${this._effects_path}${base.replace('#', idx.toString())}`;
+  pause = (paused: boolean) =>
+    this._getSound(
+      this._getPathFileName(TETRIS.SOUNDS.PAUSE, paused ? 1 : 2),
+      this.volume_effects,
+    )?.play();
 
-    private _getSound(path: string, volume?: number): HTMLAudioElement | null {
-        if (!env.sounds) return null;
-        let s: HTMLAudioElement | null = new Audio();
-        s.src = path;
-        s.load();
-        s.volume = volume ? volume : 1;
-        s.onended = () => s = null;
-        return s;
-    }
+  rotate = () => this._whoosh();
+  scroll = () => this._whoosh();
 
-    private _rnd = (min: number, max: number): number =>
-        Math.floor(Math.random() * (max - min + 1) + min);
+  brick = () =>
+    this._getSound(
+      this._getPathFileName(TETRIS.SOUNDS.BRICK, TetrisUtils.rnd(1, 6)),
+      this.volume_effects,
+    )?.play();
+
+  music = () =>
+    this._getSound(
+      `${this._basePath}${this._musicPath}${TETRIS.SOUNDS.MUSIC}`,
+      this.volume_music,
+    )?.play();
+
+  private _whoosh = () =>
+    this._getSound(
+      this._getPathFileName(TETRIS.SOUNDS.ROTATE, TetrisUtils.rnd(1, 7)),
+      this.volume_effects,
+    )?.play();
+
+  private _getPathFileName = (base: string, idx: number): string =>
+    `${this._basePath}${this._effectsPath}${base.replace('#', idx.toString())}`;
+
+  private _getSound(path: string, volume?: number): HTMLAudioElement | null {
+    if (!this._enabled) return null;
+    let sound: HTMLAudioElement | null = new Audio();
+    sound.src = path;
+    sound.load();
+    sound.volume = volume ?? 1;
+    sound.onended = () => {
+      sound = null;
+    };
+    return sound;
+  }
+
+  private _safeVolume = (v: number): number =>
+    v >= 0 && v <= 1 ? v : TETRIS.DEFAULT_VOLUME;
 }
