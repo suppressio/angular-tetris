@@ -1,4 +1,4 @@
-import { AsyncPipe, NgClass, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe, NgClass } from '@angular/common';
 import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { delay, Observable, of, repeat, Subscription } from 'rxjs';
 import { TETRIS } from 'src/app/models/contants.model';
@@ -13,7 +13,7 @@ import { TetrisUtils } from './tetris-utils';
   templateUrl: './tetris.component.html',
   styleUrls: ['./tetris.component.scss'],
   standalone: true,
-  imports: [NgFor, NgIf, NgClass, AsyncPipe],
+  imports: [NgClass, AsyncPipe],
   providers: [GameStateService, SoundsService, InputsService],
 })
 export class TetrisComponent implements OnInit, OnDestroy {

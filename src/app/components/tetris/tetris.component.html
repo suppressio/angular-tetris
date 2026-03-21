@@ -1,33 +1,33 @@
 <div class="board">
-    <table class="tetris">
-      <tr *ngFor="let row of board">
-        <td *ngFor="let cell of row"
-          [ngClass]="'color'+cell">
-        </td>
+  <table class="tetris">
+    @for (row of board; track $index) {
+      <tr>
+        @for (cell of row; track $index) {
+          <td [ngClass]="'color'+cell"></td>
+        }
       </tr>
-    </table>
-  
-  </div>
-  
-  <div class="preview">
-    <table class="tetris">
-      <tr *ngFor="let row of nextPiece.piece">
-        <td *ngFor="let cell of row"
-          [ngClass]="'color'+cell">
-        </td>
+    }
+  </table>
+</div>
+
+<div class="preview">
+  <table class="tetris">
+    @for (row of nextPiece.piece; track $index) {
+      <tr>
+        @for (cell of row; track $index) {
+          <td [ngClass]="'color'+cell"></td>
+        }
       </tr>
-    </table>
+    }
+  </table>
+</div>
+
+<div class="commands">
+  <div (click)="startGame()" (keydown.enter)="startGame()" (keydown.space)="startGame()" tabindex="0" role="button" class="div-button">Start</div>
+</div>
+
+@if (onScreenMessage$ | async; as message) {
+  <div class="screen-cover-messages">
+    {{ message }}
   </div>
-  
-  <div class="commands">
-    <button class="start-button"
-      (click)="startGame()">
-      Start
-  </button>
-  </div>
-  
-  <div 
-    class="screen-cover-messages" 
-    *ngIf="onScreenMessage$ | async">
-    {{ onScreenMessage$ | async }}
-  </div>
+}

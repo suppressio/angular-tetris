@@ -74,18 +74,16 @@
     top: 150px;
     left: 10px;
     color: white;
+
+    cursor: pointer;
 }
 
-.start-button {
-    background-color: transparent;
+.div-button {
     border: 1px solid white;
-    color: white;
     border-radius: 2px;
-    padding: 6px 8px;
-    text-transform: uppercase;
-    cursor: pointer;
+    padding: 4px;
 
-    &:focus{
+    &:focus {
         background-color: rgba(0, 0, 255, 0.5);
     }
 }
