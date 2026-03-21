@@ -9,6 +9,7 @@ export class InputsService {
         | Moves.LEFT 
         | Moves.RIGHT 
         | Moves.ROTATE_L 
+        | Moves.ROTATE_R
         | Moves.SCROLL 
         | "__p" 
         | undefined {
@@ -23,6 +24,9 @@ export class InputsService {
                 return Moves.RIGHT;
             case " ":
                 return Moves.ROTATE_L;
+            case "z":
+            case "Z":
+                return Moves.ROTATE_R;
 
             case "p":
             case "P":

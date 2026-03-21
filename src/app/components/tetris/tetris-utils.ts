@@ -27,15 +27,17 @@ export abstract class TetrisUtils {
 
         for (let row = 0; row < numRows; row++)
             for (let col = 0; col < numCols; col++)
-                rotatedPiece[col][numRows - 1 - row] =
-                    t.piece[row][col];
+                if (toLeft)
+                    rotatedPiece[numCols - 1 - col][row] = t.piece[row][col];
+                else
+                    rotatedPiece[col][numRows - 1 - row] = t.piece[row][col];
 
         const idx = Object.keys(Rotations).indexOf(t.rotation);
 
         return {
             ...t,
             piece: rotatedPiece,
-            rotation: Object.keys(Rotations)[(idx + (toLeft ? -1 : 1)) % 4] as RotationsKeys,
+            rotation: Object.keys(Rotations)[(idx + (toLeft ? 3 : 1)) % 4] as RotationsKeys,
         };
     }
 
