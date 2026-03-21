@@ -1,0 +1,56 @@
+:host {
+	position: fixed;
+	inset: 0;
+	z-index: 1000;
+	display: block;
+}
+
+.dialog-backdrop {
+	position: absolute;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.55);
+}
+
+.dialog {
+	position: relative;
+	z-index: 1;
+	width: min(420px, calc(100vw - 32px));
+	margin: 10vh auto 0;
+	padding: 20px;
+	border: 1px solid rgba(255, 255, 255, 0.4);
+	border-radius: 8px;
+	background: #161616;
+	color: white;
+	box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+}
+
+.title {
+	margin: 0 0 16px;
+	font-size: 20px;
+	text-transform: uppercase;
+}
+
+.content {
+	min-height: 48px;
+}
+
+.actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 8px;
+	margin-top: 16px;
+}
+
+.actions button {
+	border: 1px solid rgba(255, 255, 255, 0.5);
+	background: transparent;
+	color: white;
+	border-radius: 4px;
+	padding: 6px 10px;
+	cursor: pointer;
+}
+
+.actions button:hover,
+.actions button:focus {
+	background: rgba(255, 255, 255, 0.12);
+}

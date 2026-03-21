@@ -23,8 +23,8 @@
 </div>
 
 <div class="commands">
-  <div (click)="startGame()" (keydown.enter)="startGame()" (keydown.space)="startGame()" tabindex="0" role="button" class="div-button">Start</div>
-  <div (click)="openSettings()" (keydown.enter)="openSettings()" (keydown.space)="openSettings()" tabindex="0" role="button" class="div-button">Settings</div>
+  <div (mousedown)="$event.preventDefault()" (click)="startGame()" (keydown.enter)="startGame()" tabindex="0" role="button" class="div-button">Start</div>
+  <div (mousedown)="$event.preventDefault()" (click)="openSettings()" (keydown.enter)="openSettings()" tabindex="0" role="button" class="div-button">Settings</div>
   <div class="debug">CountMove: {{ countNoCollision }}<br/>Pause: {{ paused }}</div>
 </div>
 

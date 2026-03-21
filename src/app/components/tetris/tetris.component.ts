@@ -1,6 +1,6 @@
 import { AsyncPipe, NgClass } from '@angular/common';
-import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
-import { delay, Observable, of, repeat, Subscription } from 'rxjs';
+import { ChangeDetectorRef, Component, HostListener, inject, OnDestroy, OnInit } from '@angular/core';
+import { Observable, Subscription, timer } from 'rxjs';
 import { TETRIS } from 'src/app/models/contants.model';
 import { Coords, GameStates, Moves, Teramino } from '../../models/game.model';
 import { SettingsDialogComponent } from '../dialog/settings-dialog.component';
@@ -19,6 +19,12 @@ import { TetrisUtils } from './tetris-utils';
   providers: [GameStateService, SoundsService, InputsService, SettingsDialogService],
 })
 export class TetrisComponent implements OnInit, OnDestroy {
+  private game = inject(GameStateService);
+  private sound = inject(SoundsService);
+  private input = inject(InputsService);
+  private settingsDialog = inject(SettingsDialogService);
+  private cdr = inject(ChangeDetectorRef);
+
   protected board!: number[][];
   protected nextPiece!: Teramino;
   protected onScreenMessage$: Observable<string | null> = this.game.stateMessages$;
@@ -35,14 +41,6 @@ export class TetrisComponent implements OnInit, OnDestroy {
       return acc;
     }, {} as { [key in Moves]: () => void }),
   };
-
-  constructor(
-    private game: GameStateService,
-    private sound: SoundsService,
-    private input: InputsService,
-    private settingsDialog: SettingsDialogService,
-    private cdr: ChangeDetectorRef,
-  ) {}
 
   get showSettingsDialog(): boolean {
     return this.settingsDialog.show_dialog;
@@ -65,6 +63,7 @@ export class TetrisComponent implements OnInit, OnDestroy {
     const action = this.input.keyboardEventToAction(e);
 
     if (action && action in this._actions) {
+      e.preventDefault();
       this._actions[action]();
     }
   }
@@ -238,14 +237,10 @@ export class TetrisComponent implements OnInit, OnDestroy {
   }
 
   private _startTime(): void {
-    this._timeMoveSub = of(Moves.DOWN)
-      .pipe(delay(this.game.delay), repeat())
-      .subscribe({
-        next: (m) => {
-          this._move(m);
-          this.cdr.detectChanges();
-        },
-        error: (e) => console.error(e),
+    this._timeMoveSub = timer(TETRIS.DEFAULT_DELAY, TETRIS.DEFAULT_DELAY)
+      .subscribe(() => {
+        this._move(Moves.DOWN);
+        this.cdr.detectChanges();
       });
   }
 

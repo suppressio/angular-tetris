@@ -1,11 +1,16 @@
-<div class="dialog">
-    <h1 class="title"></h1>
-    
-    <ng-content></ng-content>
+<div class="dialog-backdrop" (click)="close()"></div>
 
-    <div class="actions"
-        *ngFor="let button of buttons">
-        <button 
+<div class="dialog" role="dialog" aria-modal="true" aria-labelledby="settings-dialog-title">
+    <h1 id="settings-dialog-title" class="title">{{ title }}</h1>
+
+    <div class="content">
+        <ng-content></ng-content>
+    </div>
+
+    <div class="actions">
+        <button
+            *ngFor="let button of buttons"
+            type="button"
             (click)="button.fn()">{{button.label}}</button>
     </div>
 </div>

@@ -10,8 +10,12 @@ import { SettingsDialogService } from 'src/app/services/settings-dialog.service'
   imports: [NgFor],
 })
 export class SettingsDialogComponent {
-  protected title = '';
+  protected title = 'Settings';
   protected buttons = this.settings.buttons;
 
   constructor(private settings: SettingsDialogService) {}
+
+  close(): void {
+    this.settings.close();
+  }
 }
