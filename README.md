@@ -50,3 +50,12 @@ The game state is managed through an observable pattern using RxJS. The game can
 # License
 
 This project is licensed under the MIT License.
+
+## Project Status
+
+This repository is now considered a stable POC snapshot.
+Detailed archival notes and the next-engine plan are documented here:
+
+- [POC archive notes](docs/learned-from-poc/POC-ARCHIVE.md)
+- [Engine architecture blueprint](docs/learned-from-poc/ENGINE-BLUEPRINT.md)
+- [Execution roadmap](docs/learned-from-poc/ENGINE-ROADMAP.md)
