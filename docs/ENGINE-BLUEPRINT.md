@@ -1,3 +1,5 @@
+🌐 **English** | [Italiano](ENGINE-BLUEPRINT.it.md)
+
 # Reusable Engine Blueprint
 
 ## Vision
@@ -14,7 +16,7 @@ Build a small reusable 2D browser game engine as a TypeScript library, then impl
 
 ## Layered Architecture
 
-## 1) Engine Core
+### 1) Engine Core
 
 Responsibilities:
 
@@ -30,7 +32,7 @@ Core interfaces:
 - `EngineEvent`
 - `GameReducer<TState, TCommand, TEvent>`
 
-## 2) Game Logic Modules
+### 2) Game Logic Modules
 
 Each game owns:
 
@@ -45,7 +47,7 @@ Examples:
 - `@games/snake`
 - `@games/chess`
 
-## 3) Render Adapters
+### 3) Render Adapters
 
 Renderer layer translates game state into visuals without changing business state.
 
@@ -55,7 +57,7 @@ Possible adapters:
 - Canvas renderer;
 - optional SVG renderer.
 
-## 4) Skin and Audio Packs
+### 4) Skin and Audio Packs
 
 User-customizable resources:
 
@@ -63,7 +65,7 @@ User-customizable resources:
 - sprite packs;
 - sound packs mapped by event name.
 
-## 5) Host Applications
+### 5) Host Applications
 
 Framework app (Angular) handles:
 

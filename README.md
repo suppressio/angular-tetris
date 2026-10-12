@@ -1,61 +1,52 @@
-# Angular Tetris Game
+🌐 **English** | [Italiano](README.it.md)
 
-A simple implementation of the classic Tetris game built with Angular. 
-This project showcases basic game mechanics including piece movement, rotation and collision detection.
+# Angular Tetris
 
-![image](https://github.com/user-attachments/assets/dd5c9426-1d16-423d-8252-ca686873601b)
+The classic Tetris in the browser, built with Angular and RxJS: move and rotate the falling pieces, fill whole rows to clear them, and keep the stack from reaching the top.
 
-## Features
+![Angular Tetris](https://github.com/user-attachments/assets/dd5c9426-1d16-423d-8252-ca686873601b)
 
-- **Classic Tetris Gameplay**: Drop and rotate tetrominoes to fill rows.
-- **Pause and Resume**: Easily pause the game and resume at any time.
-- **Game States**: Handle game diffent conditions.
+- Piece movement, rotation with wall kicks, line clearing and game over.
+- Pause and resume at any time.
+- Settings: game speed, sound on/off, effects and music volume.
 
-## Acknowledgments
+> **Proof of concept, frozen.** This repository is kept as a stable snapshot (tag `v1-poc-final`): only documentation fixes and security updates, no new features. What it taught, and the plan for a reusable game engine, are in [docs/](#documentation).
 
-Inspired by the classic Tetris game.
-Built using the Angular framework and RxJS.
+---
 
-## Installation
+## Install and run
 
-To run the project locally, follow these steps:
+You need [Node.js](https://nodejs.org) 20.19 or later (Angular 21).
 
-Install the dependencies:
+```bash
+npm install
+npm start
+```
 
-`npm install`
+Then open http://localhost:4200 and press **Start**.
 
-## Start the development server
+## How to play
 
-`ng serve`
+| Key | Action |
+|---|---|
+| ← / → | move the piece left / right |
+| ↓ | move the piece down one row |
+| ↑ | drop the piece all the way down |
+| Space | rotate |
+| Z | rotate the other way |
+| P (or the Pause key) | pause / resume |
 
-Open your browser and visit http://localhost:4200 to play the game...
+**Start** begins a new game; **Settings** sets the speed (1–10), turns the sounds on or off and sets the effects and music volume.
 
-### Controls
+---
 
-- **Arrow Down**: Move the tetromino down.
-- **Arrow Up**: Scroll the tetromino down instantly.
-- **Arrow Left**: Move the tetromino left.
-- **Arrow Right**: Move the tetromino right.
-- **Space**: Rotate the tetromino.
-- **P**: Pause/Resume the game.
+## Documentation
 
-### Game States
+- [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md): build, tests, project structure, how the game loop works
+- [docs/POC-ARCHIVE.md](docs/POC-ARCHIVE.md): what this proof of concept proved, and why it is frozen
+- [docs/ENGINE-BLUEPRINT.md](docs/ENGINE-BLUEPRINT.md): architecture of the reusable 2D game engine that comes next
+- [docs/ENGINE-ROADMAP.md](docs/ENGINE-ROADMAP.md): milestones to get there
 
-The game state is managed through an observable pattern using RxJS. The game can be in three states:
+## License
 
-- **INGAME**: The game is currently being played;
-- **PAUSE**: The game is paused;
-- **GAMEOVER**: The game has ended.
-
-# License
-
-This project is licensed under the MIT License.
-
-## Project Status
-
-This repository is now considered a stable POC snapshot.
-Detailed archival notes and the next-engine plan are documented here:
-
-- [POC archive notes](docs/learned-from-poc/POC-ARCHIVE.md)
-- [Engine architecture blueprint](docs/learned-from-poc/ENGINE-BLUEPRINT.md)
-- [Execution roadmap](docs/learned-from-poc/ENGINE-ROADMAP.md)
+[MIT](LICENSE) © 2024 Daniele 'suppressio'.
